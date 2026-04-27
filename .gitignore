@@ -34,3 +34,6 @@ logs/
 # Database
 *.db
 *.h2.db
+
+.venv/
+site/

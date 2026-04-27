@@ -1,0 +1,15 @@
+# MkDocs Documentation Requirements
+# Install with: pip install -r requirements.txt
+
+# Core MkDocs
+mkdocs==1.5.3
+mkdocs-material==9.5.3
+
+# Additional plugins and extensions
+pymdown-extensions==10.5
+python-markdown-math==0.8
+
+# Optional: For advanced features
+Pillow==10.1.0
+cairosvg==2.7.1
+

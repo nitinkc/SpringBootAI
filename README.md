@@ -2,330 +2,436 @@
 
 A practical demonstration of how to integrate **AI/LLM capabilities** into Spring Boot services **without redesigning the entire system**.
 
-## 📊 Architecture Concept
-
-### Traditional Flow
-```
-Client → Controller → Service → DB/APIs → Response
-```
-
-### AI-Enhanced Flow (This Project)
-```
-Client → Controller → Service (AI Orchestrator)
-                    → Fetch Data
-                    → Build Context
-                    → Call LLM
-                    → Return Smarter Response
-```
-
-## 💡 Key Takeaway
-
-**AI is added INSIDE the service layer, NOT as a separate system.**
-
-This means:
-- ✅ Your existing controllers stay the same
-- ✅ Your data layer remains unchanged
-- ✅ AI enhancement is optional per request
-- ✅ Easy to swap LLM providers (OpenAI, Claude, Ollama, etc.)
-
-## 🎯 Three Use Cases Demonstrated
-
-### 1. **Product Search** (AI-Enhanced Search Results)
-- Traditional: Search DB → Return raw results
-- AI-Enhanced: Search DB → Build context → Call LLM → Smart recommendations
-
-**Flow:** Client → ProductSearchController → ProductSearchService (+ AiClient) → ProductRepository
-
-### 2. **Customer Support** (AI Auto-Replies)
-- Traditional: Create ticket → Save → Return confirmation
-- AI-Enhanced: Create ticket → Call LLM → Generate response → Save response
-
-**Flow:** Client → SupportController → SupportService (+ AiClient) → SupportTicketRepository
-
-### 3. **Personalized Recommendations** (AI-Powered Suggestions)
-- Traditional: Get user → Show generic products
-- AI-Enhanced: Get user → Analyze preferences → Call LLM → Personalized picks
-
-**Flow:** Client → RecommendationController → RecommendationService (+ AiClient) → Repositories
-
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Java 17 or higher
 - Maven 3.8+
 
-### Installation
-
+### Run the Application
 ```bash
-# Clone/navigate to project
-cd springbootAI
-
-# Build the project
+cd /Users/sgovinda/Learn/springbootAI
 mvn clean install
-
-# Run the application
 mvn spring-boot:run
 ```
 
-The application will start on `http://localhost:8080`
+The application will:
+- ✅ Start on `http://localhost:8080`
+- ✅ Automatically create H2 in-memory database
+- ✅ Load 10 sample products and 3 users
+- ✅ Expose REST APIs at `/api/*`
 
-## 📡 API Endpoints
-
-### 1. Product Search API
-
-#### GET - Simple Search
+### Test the APIs
 ```bash
-curl "http://localhost:8080/api/products/search?query=laptop&useAIEnhancement=false"
-```
-
-#### GET - AI-Enhanced Search
-```bash
+# Product search with AI enhancement
 curl "http://localhost:8080/api/products/search?query=laptop&useAIEnhancement=true"
-```
 
-#### GET - Category Filter with AI
-```bash
-curl "http://localhost:8080/api/products/search?category=electronics&maxPrice=1000&useAIEnhancement=true"
-```
-
-#### POST - Complex Search
-```bash
-curl -X POST "http://localhost:8080/api/products/search" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "high performance laptop",
-    "category": "electronics",
-    "maxPrice": 2000,
-    "useAIEnhancement": true
-  }'
-```
-
-### 2. Support Tickets API
-
-#### POST - Create Ticket with AI Response
-```bash
+# Create support ticket (gets AI auto-response)
 curl -X POST "http://localhost:8080/api/support/tickets" \
   -H "Content-Type: application/json" \
-  -d '{
-    "customerName": "John Doe",
-    "email": "john@example.com",
-    "issue": "I cannot login to my account, getting access denied error"
-  }'
-```
+  -d '{"customerName": "John Doe", "email": "john@example.com", "issue": "I cannot login"}'
 
-#### GET - Retrieve Ticket
-```bash
-curl "http://localhost:8080/api/support/tickets/1"
-```
-
-### 3. Recommendations API
-
-#### GET - Get Recommendations
-```bash
+# Get personalized recommendations
 curl "http://localhost:8080/api/recommendations?userId=1&limit=5"
 ```
 
-#### GET - Category-Specific Recommendations
+Or use the test script:
 ```bash
-curl "http://localhost:8080/api/recommendations?userId=2&category=electronics&limit=3"
+bash test-api.sh
 ```
 
-#### POST - Get Recommendations
+---
+
+## 📚 Complete Documentation via MkDocs
+
+This project includes **comprehensive documentation**. View it locally:
+
+### Setup Documentation Environment
+
+#### Option 1: Complete Setup with Virtual Environment (Recommended)
 ```bash
-curl -X POST "http://localhost:8080/api/recommendations" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": 1,
-    "limit": 5,
-    "category": "electronics"
-  }'
+# Step 1: Create a Python virtual environment
+python3 -m venv .venv
+
+# Step 2: Activate the virtual environment
+# On macOS/Linux:
+source .venv/bin/activate
+# On Windows:
+# venv\Scripts\activate
+
+# Step 3: Install dependencies from requirements.txt
+pip install -r requirements.txt
+
+# Step 4: Serve documentation (auto-reloads on file changes)
+mkdocs serve
+
+# Step 5: Open in your browser
+# Visit: http://localhost:8000
+
+# To deactivate virtual environment when done:
+deactivate
 ```
 
-## 🔧 Project Structure
+#### Option 2: Quick Setup (without virtual environment)
+```bash
+# Install dependencies directly
+pip install -r requirements.txt
 
-```
-src/main/java/com/example/aispring/
-├── AiSpringApplication.java          # Main Spring Boot app
-├── controller/
-│   ├── ProductSearchController.java   # REST endpoints for search
-│   ├── SupportController.java         # REST endpoints for support
-│   └── RecommendationController.java  # REST endpoints for recommendations
-├── service/
-│   ├── ProductSearchService.java      # Search logic + AI integration
-│   ├── SupportService.java            # Support logic + AI integration
-│   └── RecommendationService.java     # Recommendation logic + AI integration
-├── client/
-│   ├── AiClient.java                  # AI interface (abstraction)
-│   └── MockAiClient.java              # Mock implementation
-├── model/
-│   ├── Product.java                   # Product entity
-│   ├── SupportTicket.java             # Support ticket entity
-│   └── User.java                      # User entity
-├── dto/
-│   ├── ProductSearchRequest.java
-│   ├── ProductSearchResponse.java
-│   ├── SupportTicketRequest.java
-│   ├── SupportTicketResponse.java
-│   ├── RecommendationRequest.java
-│   └── RecommendationResponse.java
-├── repository/
-│   ├── ProductRepository.java         # Data access layer
-│   ├── SupportTicketRepository.java
-│   └── UserRepository.java
-└── config/
-    └── DataInitializationConfig.java  # Test data setup
+# Serve documentation
+mkdocs serve
+
+# Open: http://localhost:8000
 ```
 
-## 🧠 How AI Integration Works
+#### Option 3: Manual Installation
+```bash
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # macOS/Linux
 
-### The AiClient Interface
+# Install individual packages
+pip install mkdocs==1.5.3 mkdocs-material==9.5.3 pymdown-extensions==10.5
 
-```java
-public interface AiClient {
-    String generateResponse(String prompt);
-    String generateResponseWithContext(String systemPrompt, String userPrompt);
-    boolean isAvailable();
-    String getModelName();
+# Serve documentation
+mkdocs serve
+```
+
+### View Documentation
+Once documentation is serving, open **http://localhost:8000** in your browser.
+
+The documentation site will:
+- ✅ Auto-reload when you edit files in `docs/`
+- ✅ Show live preview of changes
+- ✅ Include search functionality
+- ✅ Display 24 comprehensive documentation pages
+
+### 📖 Documentation Sections
+
+#### **Core Concepts** (Understand the Architecture)
+- [LLM Integration Overview](docs/concepts/llm-integration.md) - Why integrate AI?
+- [Service Layer AI Pattern](docs/concepts/service-layer-ai.md) - Architecture pattern
+- [Abstraction & Dependency Injection](docs/concepts/abstraction-di.md) - Why abstractions matter
+- [Design Decision Matrix](docs/concepts/design-decisions.md) - Trade-offs explained
+
+#### **Three Use Cases** (Practical Implementations)
+- [Product Search](docs/use-cases/product-search.md) - AI-enhanced search ranking
+- [Support Tickets](docs/use-cases/support-tickets.md) - Auto-response generation
+- [Recommendations](docs/use-cases/recommendations.md) - Personalized suggestions
+- [Pattern Comparison](docs/use-cases/pattern-comparison.md) - When to use each pattern
+
+#### **Observability** (Monitor & Optimize)
+- [Monitoring & Metrics](docs/observability/monitoring.md) - What to measure
+- [Logging Strategy](docs/observability/logging.md) - Structured logging
+- [Cost Tracking](docs/observability/cost-tracking.md) - Monitor spending
+- [Performance Analysis](docs/observability/performance.md) - Latency & SLAs
+
+#### **Implementation** (Production Patterns)
+- [Best Practices](docs/implementation/best-practices.md) - Proven patterns
+- [Performance Optimization](docs/implementation/performance.md) - Caching strategies
+- [Error Handling](docs/implementation/error-handling.md) - Resilience patterns
+
+#### **Interview Preparation** (25+ Questions)
+- [Architecture Q&A](docs/interview/architecture-qa.md) - System design questions
+- [Design Pattern Q&A](docs/interview/design-patterns.md) - SOLID principles
+- [System Design Q&A](docs/interview/system-design.md) - Scale scenarios
+- [Observability Q&A](docs/interview/observability-qa.md) - Monitoring questions
+- [Behavioral Q&A](docs/interview/behavioral.md) - Soft skills
+
+#### **Future Development** (Extend the Project)
+- [Skills, Prompts & Agents](docs/future/skills-prompts-agents.md) - How to extend
+- [Available Agents](docs/future/agents.md) - AI automation helpers
+- [Future Use Cases](docs/future/use-cases.md) - 8 ready-to-implement features
+
+---
+
+## 💡 Architecture Overview
+
+### Traditional Flow
+```
+Client → Controller → Service → Database → Response
+```
+
+### AI-Enhanced Flow (This Project)
+```
+Client → Controller → Service (AI Orchestrator)
+                   ├─ Fetch Data
+                   ├─ Build Context
+                   ├─ Call LLM
+                   └─ Enhance Response
+```
+
+**Key Insight:** AI is integrated INSIDE the service layer, not as a separate system!
+
+---
+
+## 🎯 Three Production-Ready Use Cases
+
+### 1. Product Search
+**What it does:** Uses AI to intelligently rank products based on user intent
+
+**API Endpoint:**
+```bash
+POST /api/products/search
+{
+  "query": "high performance laptop",
+  "category": "electronics",
+  "maxPrice": 2000,
+  "useAIEnhancement": true
 }
 ```
 
-**Why this matters:** You can swap implementations without changing services!
+### 2. Customer Support
+**What it does:** Generates immediate AI-powered responses to support tickets
 
-### Service Layer Integration
-
-Example from `ProductSearchService`:
-
-```java
-// Step 1: Fetch data from DB
-List<Product> results = searchDatabase(request);
-
-// Step 2: Build context
-String context = buildSearchContext(request, results);
-
-// Step 3: Call LLM
-String aiResponse = aiClient.generateResponseWithContext(
-    "You are a product recommendation assistant...",
-    context + "\nWhat products do you recommend?"
-);
-
-// Step 4: Return enhanced response
-response.setAiSuggestion(aiResponse);
+**API Endpoint:**
+```bash
+POST /api/support/tickets
+{
+  "customerName": "John Doe",
+  "email": "john@example.com",
+  "issue": "I cannot login to my account"
+}
 ```
+
+### 3. Personalized Recommendations
+**What it does:** Analyzes user profile and suggests personalized products
+
+**API Endpoint:**
+```bash
+GET /api/recommendations?userId=1&limit=5&category=electronics
+```
+
+---
+
+## 🏗️ Project Structure
+
+```
+src/main/java/com/example/aispring/
+├── AiSpringApplication.java              # Main application
+├── client/
+│   ├── AiClient.java                     # LLM interface (abstraction)
+│   └── MockAiClient.java                 # Mock implementation
+├── controller/
+│   ├── ProductSearchController.java       # REST endpoints
+│   ├── SupportController.java
+│   └── RecommendationController.java
+├── service/
+│   ├── ProductSearchService.java          # AI orchestration
+│   ├── SupportService.java
+│   └── RecommendationService.java
+├── model/
+│   ├── Product.java                      # JPA entities
+│   ├── SupportTicket.java
+│   └── User.java
+├── dto/
+│   ├── ProductSearchRequest.java          # Request/response DTOs
+│   ├── ProductSearchResponse.java
+│   └── [5 more DTOs]
+├── repository/
+│   ├── ProductRepository.java             # Data access layer
+│   ├── SupportTicketRepository.java
+│   └── UserRepository.java
+└── config/
+    └── DataInitializationConfig.java      # Auto-load sample data
+```
+
+---
 
 ## 🔄 Swapping LLM Providers
 
 The beauty of this architecture is **you only need to implement the `AiClient` interface**:
 
-### OpenAI Implementation Example
+### OpenAI Example
 ```java
 @Component
 public class OpenAiClient implements AiClient {
-    // Call OpenAI API
     @Override
     public String generateResponse(String prompt) {
-        // Use openai-java library
-        return openaiService.createCompletion(prompt).getChoices(0).getText();
+        // Call OpenAI API
+        return openaiService.createCompletion(prompt).getText();
     }
 }
 ```
 
-### Anthropic Claude Implementation Example
+### Anthropic Claude Example
 ```java
 @Component
 public class AnthropicClient implements AiClient {
     @Override
     public String generateResponse(String prompt) {
-        // Use anthropic-sdk-java
         return anthropicClient.sendMessage(prompt);
     }
 }
 ```
 
-### Local Ollama Implementation Example
+### Local Ollama Example
 ```java
 @Component
 public class OllamaClient implements AiClient {
     @Override
     public String generateResponse(String prompt) {
-        // Call local Ollama server
         return ollamaService.generate("llama2", prompt);
     }
 }
 ```
 
-**No changes needed in services!** Just implement `AiClient` and Spring Boot's dependency injection handles the rest.
+**No service code changes needed!** Spring's dependency injection handles provider swapping automatically.
 
-## 📈 Sample Response
+---
 
-### Product Search with AI
-```json
-{
-  "results": [
-    {
-      "id": 1,
-      "name": "Premium Laptop - 15\" Display",
-      "description": "High-performance laptop with RTX 4080...",
-      "price": 1899.99,
-      "category": "Electronics",
-      "stockQuantity": 15,
-      "relevanceScore": "HIGH"
-    }
-  ],
-  "aiSuggestion": "Based on your search for 'laptop', I recommend the Premium Laptop 15\". It features an RTX 4080 which is excellent for programming and video editing...",
-  "enhancedWithAI": true,
-  "reasoningExplanation": "Results enhanced with AI analysis of your query and available products"
-}
-```
+## 🧠 Key Learning Points
 
-### Support Ticket with AI Response
-```json
-{
-  "ticketId": 1,
-  "customerName": "John Doe",
-  "status": "ASSIGNED",
-  "issue": "I cannot login to my account",
-  "aiResponse": "Thank you for contacting us. I understand you're having login issues. Here are the most common solutions: 1) Clear your browser cache and cookies... 2) Try a different browser... 3) Reset your password...",
-  "aiModel": "MockAI-v1.0",
-  "processingTimeMs": 145
-}
-```
-
-## 🎓 Learning Points
-
-1. **Abstraction is Key**: The `AiClient` interface allows you to swap LLM providers without touching service code
-2. **Layered Architecture**: Keep concerns separated (controllers, services, data layer)
-3. **Context Building**: LLMs perform better with rich context - this is done in the service layer
+1. **Abstraction is Key**: The `AiClient` interface allows swapping LLM providers without touching service code
+2. **Service Layer Pattern**: AI enhancement happens in services, not controllers
+3. **Context Building**: LLMs perform better with rich context - handled in service layer
 4. **Optional Enhancement**: Traditional flow still works; AI is opt-in
-5. **No System Redesign Needed**: Adding AI shouldn't break existing functionality
+5. **No Redesign Required**: Adding AI doesn't break existing functionality
 
-## 🚀 Next Steps - Integration with Real LLMs
+---
 
-### To use OpenAI:
-1. Add dependency: `com.openai:spring-boot-starter-openai`
-2. Create `OpenAiClient` implementing `AiClient`
-3. Add API key to `application.yml`
-4. Spring automatically injects your implementation
+## 🔧 Extending the Project
 
-### To use Claude:
-1. Add Anthropic SDK dependency
-2. Create `AnthropicClient` implementing `AiClient`
-3. No service code changes needed!
+Want to add new features? Follow these steps:
 
-### To use Local Ollama:
-1. Install Ollama locally
-2. Create `OllamaClient` implementing `AiClient`
-3. Point to your local Ollama server
+### Step 1: Read Skills
+Learn best practices for your domain:
+```
+.github/skills/llm-integration/SKILL.md
+.github/skills/performance-optimization/SKILL.md
+.github/skills/testing-strategy/SKILL.md
+```
 
-## 📝 Database
+### Step 2: Read Prompts
+Get step-by-step instructions:
+```
+prompts/add-provider.md
+prompts/add-use-case.md
+prompts/optimize-performance.md
+```
+
+### Step 3: Use Agents (Optional)
+Let AI help with implementation:
+```
+@llm-integration "Add OpenAI provider"
+@performance-tuning "Optimize latency"
+@test-generation "Create tests for review sentiment"
+```
+
+**Full guide:** See [Skills, Prompts & Agents](docs/future/skills-prompts-agents.md)
+
+---
+
+## 📈 Future Use Cases
+
+8 production-ready features ready to implement:
+
+**Easy (1 day)**
+- Review Sentiment Analysis
+- Product Auto-tagging
+
+**Medium (2-3 days)**
+- Review Summarization
+- Content Moderation
+- Dynamic Pricing
+
+**Hard (4-5 days)**
+- Fraud Detection
+- Demand Forecasting
+- QA Chatbot
+
+See [Future Use Cases](docs/future/use-cases.md) for details on each.
+
+---
+
+## 🗄️ Database
 
 - **Engine**: H2 (in-memory for demo)
-- **JPA**: Hibernate
-- **Data**: Auto-loaded on startup with sample products and users
+- **ORM**: Hibernate + Spring Data JPA
+- **Data**: Auto-loaded on startup
 
-Access H2 console at: `http://localhost:8080/h2-console`
+Access H2 console: `http://localhost:8080/h2-console`
 - JDBC URL: `jdbc:h2:mem:testdb`
 - User: `sa`
 - Password: (leave blank)
+
+---
+
+## 📞 Troubleshooting
+
+### Application won't start
+```bash
+# Check Java version (needs 17+)
+java -version
+
+# Clean rebuild
+mvn clean install -DskipTests
+```
+
+### Port 8080 already in use
+Edit `src/main/resources/application.yml`:
+```yaml
+server:
+  port: 8081
+```
+
+### Build fails with dependencies
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+
+---
+
+## 📚 Interview Preparation
+
+This project is designed for technical interview preparation:
+
+### 1. Understanding Phase (1 hour)
+Read:
+- [LLM Integration Overview](docs/concepts/llm-integration.md)
+- [Service Layer AI Pattern](docs/concepts/service-layer-ai.md)
+
+### 2. Deep Dive Phase (1 hour)
+Study the code:
+- [ProductSearchService.java](src/main/java/com/example/aispring/service/ProductSearchService.java)
+- Trace Request → Service → LLM → Response
+
+### 3. System Design Phase (1 hour)
+Review:
+- [Design Decision Matrix](docs/concepts/design-decisions.md)
+- [Interview System Design Q&A](docs/interview/system-design.md)
+
+### 4. Practice Phase (1 hour)
+Answer questions:
+- [Architecture Q&A](docs/interview/architecture-qa.md)
+- [Design Pattern Q&A](docs/interview/design-patterns.md)
+- [Behavioral Q&A](docs/interview/behavioral.md)
+
+---
+
+## 🎓 Key Talking Points
+
+### "Tell me about your AI integration experience"
+**Answer:**
+1. Context: "I created a Spring Boot service that integrates LLMs"
+2. Architecture: "AI is in the service layer, not controllers"
+3. Design: "Strategy pattern for provider switching"
+4. Metrics: "Cost tracking, latency monitoring, cache hit rates"
+
+### "What was the biggest challenge?"
+**Good answers:**
+- "Latency: LLM calls add 1-5 seconds. Solved with caching (40-60% hit rate)"
+- "Cost: $0.001/request adds up. Optimized with semantic caching"
+- "Quality: AI responses sometimes wrong. Added validation and fallbacks"
+
+### "How do you measure success?"
+**Right metrics:**
+- Cost per feature ($/request)
+- User impact (CTR, conversion rate)
+- Technical metrics (P95 latency, error rate)
+- Cache efficiency (hit rate, cost savings)
+
+---
 
 ## 🔍 Key Files to Review
 
@@ -334,49 +440,39 @@ Access H2 console at: `http://localhost:8080/h2-console`
 | [AiClient.java](src/main/java/com/example/aispring/client/AiClient.java) | LLM interface - the abstraction layer |
 | [ProductSearchService.java](src/main/java/com/example/aispring/service/ProductSearchService.java) | Shows step-by-step AI integration |
 | [MockAiClient.java](src/main/java/com/example/aispring/client/MockAiClient.java) | Example implementation |
-| [application.yml](src/main/resources/application.yml) | Configuration |
+| [application.yml](src/main/resources/application.yml) | Spring Boot configuration |
 
-## 🐛 Troubleshooting
+---
 
-### Application won't start
-```bash
-# Check Java version
-java -version  # Should be 17+
+## 🎯 Design Principles
 
-# Check Maven installation
-mvn -v
+This project demonstrates **SOLID principles**:
 
-# Clean rebuild
-mvn clean install
-```
+- **S**ingle Responsibility: Each class has one reason to change
+- **O**pen/Closed: Open for extension (new AI providers), closed for modification
+- **L**iskov Substitution: Any AiClient implementation can be swapped
+- **I**nterface Segregation: AiClient interface is focused and minimal
+- **D**ependency Inversion: Spring DI manages dependencies, not constructors
 
-### Port 8080 already in use
-Edit `src/main/resources/application.yml`:
-```yaml
-server:
-  port: 8081  # Change to different port
-```
+---
 
-## 📚 Theory Behind the Architecture
+## 🚀 Next Steps
 
-This project demonstrates the **Single Responsibility Principle**:
-- **Controllers**: Handle HTTP requests/responses
-- **Services**: Contain business logic and AI orchestration
-- **Repositories**: Handle data persistence
-- **AiClient**: Encapsulates LLM communication
+1. **Run the app**: `mvn spring-boot:run`
+2. **Test the APIs**: `bash test-api.sh`
+3. **Read the docs**: `mkdocs serve` → http://localhost:8000
+4. **Study the code**: Review ProductSearchService.java
+5. **Extend it**: Add a new use case or LLM provider
 
-Each layer has ONE responsibility, making the code:
-- ✅ Easy to test
-- ✅ Easy to modify
-- ✅ Easy to scale
-- ✅ Easy to swap components (like LLM providers)
+---
 
 ## 📞 Support
 
-For questions or issues, review:
-1. Application logs (DEBUG level enabled)
-2. The code comments in service classes
-3. REST API examples above
+For questions or issues:
+1. Check the [FAQ in docs](docs/future/skills-prompts-agents.md)
+2. Review [Best Practices](docs/implementation/best-practices.md)
+3. See [Error Handling Guide](docs/implementation/error-handling.md)
+4. Check application logs (DEBUG level enabled)
 
 ---
 
