@@ -9,7 +9,7 @@ mkdocs-material==9.5.3
 pymdown-extensions==10.5
 python-markdown-math==0.8
 
-# Optional: For advanced features
-Pillow==10.1.0
-cairosvg==2.7.1
+# Optional: For advanced features (use pre-built wheels)
+Pillow>=10.0.0
+cairosvg>=2.7.0
 

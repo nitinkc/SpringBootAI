@@ -57,7 +57,7 @@ python3 -m venv .venv
 # On macOS/Linux:
 source .venv/bin/activate
 # On Windows:
-# venv\Scripts\activate
+# .venv\Scripts\activate
 
 # Step 3: Install dependencies from requirements.txt
 pip install -r requirements.txt
@@ -72,7 +72,22 @@ mkdocs serve
 deactivate
 ```
 
-#### Option 2: Quick Setup (without virtual environment)
+#### Option 2: Minimal Setup (if you have dependency issues)
+```bash
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install minimal dependencies (no optional packages)
+pip install -r requirements-minimal.txt
+
+# Serve documentation
+mkdocs serve
+
+# Open: http://localhost:8000
+```
+
+#### Option 3: Quick Setup (without virtual environment)
 ```bash
 # Install dependencies directly
 pip install -r requirements.txt
@@ -83,7 +98,7 @@ mkdocs serve
 # Open: http://localhost:8000
 ```
 
-#### Option 3: Manual Installation
+#### Option 4: Manual Installation
 ```bash
 # Create and activate virtual environment
 python3 -m venv venv
