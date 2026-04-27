@@ -2,6 +2,8 @@
 
 A practical demonstration of how to integrate **AI/LLM capabilities** into Spring Boot services **without redesigning the entire system**.
 
+[https://nitinkc.github.io/SpringBootAI/](https://nitinkc.github.io/SpringBootAI/)
+
 ## 🚀 Quick Start
 
 ### Prerequisites
